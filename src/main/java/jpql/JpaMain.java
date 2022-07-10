@@ -19,19 +19,15 @@ public class JpaMain {
 
             em.persist(member);
 
-//            TypedQuery<Member> query = em.createQuery("select m from Member m", Member.class);
-//            TypedQuery<String> query2 = em.createQuery("select m.username from Member m", String.class);
-//            Query query3 = em.createQuery("select m.username, m.age from Member m");
+            em.flush();
+            em.clear();
 
-            // 결과가 없으면 빈 리스트 반환
-//            List<Member> resultList = query.getResultList();
-            // 결과가 없으면 NoResultException, 둘 이상이면 NonUniqueResultException
-//            Member singleResult = query.getSingleResult();
+            List<MemberDTO> resultList = em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
+                    .getResultList();
 
-            Member singleResult = em.createQuery("select m from Member m where m.username = :username", Member.class)
-                    .setParameter("username", "member1")
-                    .getSingleResult();
-            System.out.println("singleResult = " + singleResult.getUsername());
+            MemberDTO memberDTO = resultList.get(0);
+            System.out.println("username = " + memberDTO.getUsername());
+            System.out.println("age = " + memberDTO.getAge());
 
             tx.commit();
         } catch (Exception e) {
