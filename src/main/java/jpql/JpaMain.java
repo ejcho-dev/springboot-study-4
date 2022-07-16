@@ -1,7 +1,9 @@
 package jpql;
 
-import javax.persistence.*;
-import java.util.Collection;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 import java.util.List;
 
 public class JpaMain {
@@ -40,9 +42,10 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query = "select distinct t from Team t join fetch t.members";
+            String query = "select t from Team t";
 
-            List<Team> result = em.createQuery(query, Team.class).getResultList();
+            List<Team> result = em.createQuery(query, Team.class)
+                    .setFirstResult(0).setMaxResults(2).getResultList();
 
             for (Team team : result) {
                 System.out.println("team = " + team.getName() + " | " + team.getMembers().size());
