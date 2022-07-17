@@ -39,17 +39,21 @@ public class JpaMain {
             member3.setTeam(teamB);
             em.persist(member3);
 
-            em.flush();
-            em.clear();
+            // FLUSH 자동호출
+            int resultCount = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate();
 
-            List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
-                    .setParameter("username", "회원1")
-                    .getResultList();
+            System.out.println("resultCount = " + resultCount);
 
-            for (Member member : resultList) {
-                System.out.println("member = " + member);
-            }
+            em.clear(); // 벌크연산 후 클리어를 해줘야 다시 조회하는 findMember 의 age 가 20으로 출력됨!
 
+            Member findMember = em.find(Member.class, member1.getId());
+            System.out.println("findMember = " + findMember);
+
+            // 0 0 0 출력 --> 이런 상황을 주의해야 함. 벌크연산은 영속성컨텍스트를 무시! DB 에만 반영됨!
+            System.out.println("member1.getAge() = " + member1.getAge()); // 0
+            System.out.println("member2.getAge() = " + member2.getAge()); // 0
+            System.out.println("member3.getAge() = " + member3.getAge()); // 0
 
             tx.commit();
         } catch (Exception e) {
